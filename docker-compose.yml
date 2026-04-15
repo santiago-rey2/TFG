@@ -1,0 +1,23 @@
+services:
+  # Servicio para comprobar el estado del robot y telemetría
+  status:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: robot-status:latest
+    env_file:
+      - .env
+    command: python src/robot_status.py
+
+  # Servicio para ejecutar la trayectoria de escaneo plana
+  movement:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: robot-movement:latest
+    env_file:
+      - .env
+    command: python src/robot_movement.py
+    # Nota: Si el robot no es accesible desde el contenedor, 
+    # descomenta la siguiente línea para usar la red del host:
+    # network_mode: "host"
