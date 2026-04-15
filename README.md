@@ -1,6 +1,6 @@
-# TFG: Análisis de datos - Gocator 2600 & UR10e
+# TFG: Análisis de datos - Gocator & UR10e
 
-Este repositorio contiene las herramientas de comunicación y control desarrolladas para el Trabajo de Fin de Grado centrado en el escaneo y análisis de datos con un perfilómetro **Gocator 2600** montado en un robot **UR10e**.
+Este repositorio contiene las herramientas de comunicación y control desarrolladas para el Trabajo de Fin de Grado centrado en el escaneo y análisis de datos con un perfilómetro **Gocator** montado en un robot **UR10e**.
 
 ## 🚀 Descripción General
 
@@ -69,6 +69,26 @@ El script `robot_movement.py` está configurado con las siguientes coordenadas a
 | Wrist 3 | 0.00 | 0.03 |
 
 **Nota técnica:** El sistema recalcula automáticamente la cinemática directa para forzar una trayectoria horizontal plana, evitando desniveles durante el escaneo.
+
+---
+
+## ⚠️ Diferencias entre URSim y Robot Real (PolyScope)
+
+Para que el controlador físico admita comandos de movimiento enviados desde el exterior (como los de los scripts de Python a través de RTDE), es necesario realizar ajustes específicos en la interfaz del robot real que suelen estar pre-configurados en el simulador.
+
+### Configuración del Control Remoto en el Robot Físico
+
+Según el manual oficial del UR10e, siga estos pasos en la consola **PolyScope**:
+
+1.  **Acceder a los Ajustes:** En el encabezado (esquina superior derecha), pulse el **Menú Hamburguesa** (tres líneas horizontales) y seleccione **Ajustes (Settings)**.
+2.  **Navegar a Control Remoto:** En el menú de la izquierda, dentro de la categoría **Sistema (System)**, seleccione la opción **Control remoto (Remote Control)**.
+3.  **Habilitar la función:** Pulse el botón **Habilitar (Enable)**. Esto elimina la restricción por defecto que bloquea el encendido, la liberación de frenos y la ejecución de programas vía red.
+4.  **Activar el modo Remoto:** Una vez habilitado, debe indicarle activamente al robot que ceda el control. En la esquina superior derecha del encabezado, cambie el modo de **Control local** a **Control remoto**.
+
+### Observaciones Importantes:
+
+*   **Iconografía:** En el simulador URSim, el icono de "Local / Remote" aparece como una pantalla con una mano. En robots físicos con PolyScope 5, este cambio puede realizarse pulsando el **icono de perfil** en la esquina superior derecha para alternar entre el control de la consola portátil (Local) y el externo (Remoto).
+*   **Seguridad:** Si el robot tiene configurada una "Contraseña de modo", el sistema la solicitará al intentar cambiar a modo Remoto o al seleccionar perfiles de Operador/Programador para autorizar el control externo.
 
 ---
 
