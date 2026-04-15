@@ -12,7 +12,7 @@ import sys
 
 def main():
     # Configuración de red
-    robot_ip = os.getenv("ROBOT_IP", "192.168.1.224")
+    robot_ip = os.getenv("ROBOT_IP", "192.168.0.210")
 
     # Definición de coordenadas objetivo (Grados)
     # Origen: Posición de inicio del escaneo

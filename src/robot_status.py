@@ -10,7 +10,7 @@ import sys
 
 def main():
     # Configuración de la dirección IP desde variables de entorno
-    robot_ip = os.getenv("ROBOT_IP", "192.168.1.224")
+    robot_ip = os.getenv("ROBOT_IP", "192.168.0.210")
 
     try:
         print(f"[*] Estableciendo conexión con el robot en {robot_ip}...")
