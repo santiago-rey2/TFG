@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: robot-status:latest
+    image: robot-status:0.1
     env_file:
       - .env
     command: python src/robot_status.py
@@ -14,7 +14,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: robot-movement:latest
+    image: robot-movement:0.1
     env_file:
       - .env
     command: python src/robot_movement.py
