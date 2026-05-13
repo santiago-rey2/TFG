@@ -21,37 +21,60 @@ Para ejecutar este proyecto de forma aislada y segura, es necesario disponer de:
 
 ## ⚙️ Configuración del Entorno
 
-Antes de iniciar los servicios, debes configurar la dirección IP de tu robot:
+Antes de iniciar los servicios, debes configurar las direcciones IP y parámetros en un archivo `.env`:
 
-1.  Crea un archivo llamado `.env` en la raíz del proyecto (puedes copiar el ejemplo si existe).
-2.  Define la variable `ROBOT_IP`:
+1.  Crea un archivo llamado `.env` en la raíz del proyecto (basado en `.env.example`).
+2.  Define las variables necesarias:
     ```env
+    # Robot UR10e
     ROBOT_IP=192.168.1.210
+
+    # Perfilómetro Gocator
+    GOCATOR_IP=192.168.1.10
+    GOCATOR_PORT=8190
+    SWEEP_TIME=10
     ```
 
 ---
 
 ## 📦 Guía de Uso con Docker Compose
 
-La imagen de Docker incluye todas las dependencias necesarias (`cmake`, `libboost-all-dev`, `ur_rtde`) pre-instaladas y configuradas.
+La imagen de Docker incluye todas las dependencias necesarias (`ur_rtde`, `socket`, etc.) configuradas.
 
 ### 1. Construcción de la imagen
-Si es la primera vez que usas el proyecto o has realizado cambios en el código:
 ```bash
 docker compose build
 ```
 
-### 2. Verificar Conexión (Status)
-Utiliza este comando para confirmar que el robot es accesible y ver su posición actual:
-```bash
-docker compose run status
-```
+### 2. Servicios de Diagnóstico
+*   **Robot Status**: Ver telemetría actual del UR10e.
+    ```bash
+    docker compose run status
+    ```
+*   **Gocator Control**: Iniciar un escaneo temporizado aislado (barrido manual).
+    ```bash
+    docker compose run gocator
+    ```
 
-### 3. Ejecutar Trayectoria de Escaneo (Movement)
-Este comando moverá el robot desde la posición de **Origen** a la de **Fin** de manera lineal, asegurando una altura (Z) constante:
-```bash
-docker compose run movement
-```
+### 3. Ejecución de Trayectorias
+*   **Movement**: Mueve el robot entre los puntos de origen y fin (sin sensor).
+    ```bash
+    docker compose run movement
+    ```
+*   **Scan (Sincronizado)**: **Comando principal de trabajo**. Coordina el movimiento del brazo con la activación/desactivación automática del Gocator.
+    ```bash
+    docker compose run scan
+    ```
+
+---
+
+## 🔍 Configuración del Gocator (GoPxL)
+
+Para que los comandos remotos funcionen, el sensor debe estar configurado en su interfaz web:
+*   **Scan Mode**: `Surface` (para capturas volumétricas).
+*   **Surface Generation**: `Sequential` o `Software`.
+*   **Trigger Source**: `Time` o `Software`.
+*   **Protocolo**: `ASCII` habilitado en la pestaña Output > Ethernet.
 
 ---
 

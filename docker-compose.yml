@@ -18,6 +18,22 @@ services:
     env_file:
       - .env
     command: python src/robot_movement.py
-    # Nota: Si el robot no es accesible desde el contenedor, 
-    # descomenta la siguiente línea para usar la red del host:
-    # network_mode: "host"
+  
+  gocator:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: robot-gocator:0.1
+    env_file:
+      - .env
+    command: python src/gocator.py
+
+  # Servicio para realizar el escaneo sincronizado (Robot + Gocator)
+  scan:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: robot-scan:0.1
+    env_file:
+      - .env
+    command: python src/scan_sync.py
