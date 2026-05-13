@@ -1,32 +1,53 @@
-# Informe progreso día 3
+# Informe de Progreso: Control Remoto y Especificaciones de Acople
 
-## Activar Remote control en el robot real
+**Fecha:** 11 de mayo de 2026  
+**Proyecto:** Sistema de análisis de superficies - Gocator & UR10e  
+**Estado:** Fase 3 - Preparación de hardware y control remoto.
 
-en la pestaña de modos primero pasar de modo manual a modo automatic 
-Luego de modo automatic a modo remote control
+---
 
-No permite el propio 
+## 1. Configuración de Control Remoto en UR10e
 
-## Medidas cabeza del robot para hacer el acople para el gocator
+Se ha procedido a habilitar la capacidad de control externo desde la interfaz física del brazo robótico (Teach Pendant) para permitir la ejecución de comandos vía RTDE sin intervención manual constante.
 
-Aro de acople medidas :
+### 1.1. Procedimiento de Activación
+Para habilitar el control remoto, se ha seguido la secuencia de estados en el Polyscope:
+1.  **Modo Manual a Automático:** Cambio de estado en la pestaña de modos.
+2.  **Modo Automático a Remote Control:** Activación final que permite la escucha de puertos externos.
 
-63 mm diametro exterior
-30 mm diametro interior
+*Nota:* Se ha observado que el sistema bloquea ciertas operaciones manuales mientras el modo `Remote Control` está activo, garantizando la seguridad en la ejecución remota.
 
-Diametro cabeza total 90 mm
+---
 
-Tornillos M7 de 8mm de largo Cabeza de 7mm 
+## 2. Dimensionamiento del Acople para Perfilómetro Gocator
 
+Se han realizado las mediciones críticas del cabezal del robot (Wrist 3) para el diseño del soporte que integrará el Gocator 2600.
 
-## Movimiento del robot
+### 2.1. Dimensiones del Aro de Acople
+| Parámetro | Medida (mm) |
+| :--- | :--- |
+| Diámetro Exterior | 63 mm |
+| Diámetro Interior | 30 mm |
+| Diámetro Total del Cabezal | 90 mm |
 
-Conseguimos mover correctamente el robot mediante el script
-Ahora necesitamos para la siguiente vez, conectar el gocator directamente al robot y con ambos conectados, conseguir realiazar un movimiento.
+### 2.2. Tornillería Requerida
+- **Tipo:** Tornillos M6.
+- **Longitud:** 8 mm.
+- **Cabeza:** 7 mm.
 
-Una vez conseguido podremos probar a escanerar algún tipo de objeto 
+---
 
-## Proximamente 
+## 3. Validación de Movimiento Programático
 
-- Hacer una grabación del robot moviendose lanzando el script.
-- Hacer acople para conectar ambos dispositivos.
+Se ha confirmado la correcta ejecución de trayectorias utilizando los scripts desarrollados en fases anteriores. El robot responde con precisión a los comandos de movimiento lineal (`moveL`).
+
+### 3.1. Hitos Alcanzados:
+*   Movimiento exitoso mediante ejecución de script de Python.
+*   Estabilidad en la trayectoria sin alarmas de colisión o singularidad.
+
+---
+
+## Próximos Pasos (Fase 3):
+1.  **Grabación Audiovisual:** Realizar captura de vídeo del robot en movimiento ejecutando el ciclo de escaneo.
+2.  **Integración de Hardware:** Conexión directa del Gocator al controlador del robot.
+3.  **Diseño Final:** Fabricación del acople basado en las medidas obtenidas.
