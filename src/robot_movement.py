@@ -16,9 +16,8 @@ def main():
 
     # Definición de coordenadas objetivo (Grados)
     # Origen: Posición de inicio del escaneo
-    origin_deg = [-143.03, -62.89, 81.82, -110.44, -92.18, 0.00]
-    # Fin: Posición final del escaneo
-    end_deg = [-57.92, -68.94, 88.45, -113.97, -88.96, 0.03]
+    origin_deg = [60, -118, -75, -75, 89, 149]
+    end_deg = [132, -108, -87, -72, 90, 220]
 
     # Conversión a radianes para compatibilidad con UR_RTDE
     origin_q = [math.radians(d) for d in origin_deg]
@@ -47,7 +46,7 @@ def main():
         # Ejecución de secuencia de movimiento
         print("\n[1/2] Moviendo a posición de ORIGEN...")
         rtde_ctrl.moveL(origin_pose, velocity, acceleration)
-        
+        sudo apt install remmina remmina-plugin-vnc
         print("[*] Estabilizando posición...")
         time.sleep(1.0)
 

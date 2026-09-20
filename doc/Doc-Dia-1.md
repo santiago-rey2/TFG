@@ -74,3 +74,4 @@ El objetivo es desarrollar un protocolo de comunicación general que no dependa 
 2.  Este script permite enviar comandos de movimiento y recibir telemetría en tiempo real, lo que facilitará la sincronización futura entre la posición del brazo (coordenadas X, Y, Z) y las capturas del perfilómetro de masas.
 
 ---
+easybot

@@ -34,8 +34,8 @@ def main():
     robot_ip = os.getenv("ROBOT_IP", "192.168.0.210")
     
     # Coordenadas de Referencia (TFG)
-    origin_deg = [-143.03, -62.89, 81.82, -110.44, -92.18, 0.00]
-    end_deg = [-57.92, -68.94, 88.45, -113.97, -88.96, 0.03]
+    origin_deg = [60, -118, -75, -75, 89, 149]
+    end_deg = [132, -108, -87, -72, 90, 220]
 
     origin_q = [math.radians(d) for d in origin_deg]
     end_q = [math.radians(d) for d in end_deg]
@@ -44,7 +44,7 @@ def main():
         print(f"[*] Conectando con robot en {robot_ip}...")
         rtde_ctrl = rtde_control.RTDEControlInterface(robot_ip)
         
-        velocity = 0.25
+        velocity = 0.1
         acceleration = 0.2
 
         print("[*] Calculando trayectoria...")

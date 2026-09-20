@@ -33,7 +33,7 @@ if __name__ == "__main__":
     enviar_comando_ascii("start")
 
     # 2. Ventana de tiempo para el barrido
-    tiempo_barrido = int(os.getenv("SWEEP_TIME", 10))
+    tiempo_barrido = int(os.getenv("SWEEP_TIME", 30))
     print(f"[*] Láser activado. Realizando barrido durante {tiempo_barrido} segundos...")
     time.sleep(tiempo_barrido)
 
