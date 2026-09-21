@@ -1,0 +1,30 @@
+{
+  "nombre_trayectoria": "Trayectoria_Referencia_TFG",
+  "descripcion": "Trayectoria lineal plana horizontal de referencia del TFG entre origen y fin en grados articulares.",
+  "parametros_defecto": {
+    "velocidad": 0.1,
+    "aceleracion": 0.2,
+    "forzar_z_constante": true
+  },
+  "rutas": [
+    {
+      "id": 1,
+      "nombre": "Posicionamiento_Origen",
+      "tipo_movimiento": "lineal",
+      "tipo_coordenadas": "articulares_deg",
+      "destino": [60.0, -118.0, -75.0, -75.0, 89.0, 149.0],
+      "escanear": false
+    },
+    {
+      "id": 2,
+      "nombre": "Barrido_Lineal_Escaneo",
+      "tipo_movimiento": "lineal",
+      "tipo_coordenadas": "articulares_deg",
+      "origen": [60.0, -118.0, -75.0, -75.0, 89.0, 149.0],
+      "destino": [132.0, -108.0, -87.0, -72.0, 90.0, 220.0],
+      "velocidad": 0.1,
+      "aceleracion": 0.2,
+      "escanear": true
+    }
+  ]
+}

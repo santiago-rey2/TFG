@@ -7,6 +7,9 @@ services:
     image: robot-status:0.1
     env_file:
       - .env
+    volumes:
+      - ./src:/app/src
+      - ./routes:/app/routes
     command: python src/robot_status.py
 
   # Servicio para ejecutar la trayectoria de escaneo plana
@@ -17,6 +20,9 @@ services:
     image: robot-movement:0.1
     env_file:
       - .env
+    volumes:
+      - ./src:/app/src
+      - ./routes:/app/routes
     command: python src/robot_movement.py
   
   gocator:
@@ -26,6 +32,9 @@ services:
     image: robot-gocator:0.1
     env_file:
       - .env
+    volumes:
+      - ./src:/app/src
+      - ./routes:/app/routes
     command: python src/gocator.py
 
   # Servicio para realizar el escaneo sincronizado (Robot + Gocator)
@@ -36,4 +45,8 @@ services:
     image: robot-scan:0.1
     env_file:
       - .env
+    volumes:
+      - ./src:/app/src
+      - ./routes:/app/routes
     command: python src/scan_sync.py
+

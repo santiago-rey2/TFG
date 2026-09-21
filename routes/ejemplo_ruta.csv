@@ -1,0 +1,4 @@
+id,nombre,tipo_movimiento,tipo_coordenadas,escanear,velocidad,aceleracion,blend_radius,x,y,z,rx,ry,rz,via_x,via_y,via_z,via_rx,via_ry,via_rz
+1,Posicionamiento_Home,lineal,articulares_deg,false,0.15,0.2,0.0,60,-118,-75,-75,89,149,,,,,,
+2,Barrido_Lineal,lineal,articulares_deg,true,0.05,0.2,0.0,132,-108,-87,-72,90,220,,,,,,
+3,Arco_Circular,circular,cartesianas,true,0.04,0.2,0.01,0.500,-0.150,0.150,3.1415,0.0,0.0,0.450,-0.200,0.150,3.1415,0.0,0.0
