@@ -56,15 +56,45 @@ docker compose build
     docker compose run gocator
     ```
 
-### 3. Ejecución de Trayectorias
-*   **Movement**: Mueve el robot entre los puntos de origen y fin (sin sensor).
-    ```bash
-    docker compose run movement
-    ```
-*   **Scan (Sincronizado)**: **Comando principal de trabajo**. Coordina el movimiento del brazo con la activación/desactivación automática del Gocator.
+### 3. Ejecución de Trayectorias y Rutas Parametrizadas
+Los servicios admiten tres vías de suministro de puntos y rutas: **JSON**, **CSV** y **Consola (CLI / Interactivo)**, con soporte para movimientos **lineales (`moveL`)** y **circulares (`moveC`)**:
+
+*   **Ruta por Defecto (Referencia TFG)**:
     ```bash
     docker compose run scan
     ```
+*   **Carga desde Archivo JSON** (definición estructurada):
+    ```bash
+    docker compose run scan python src/scan_sync.py --json routes/ejemplo_ruta_mixta.json
+    ```
+*   **Carga desde Archivo CSV** (edición tabular en Excel):
+    ```bash
+    docker compose run movement python src/robot_movement.py --csv routes/ejemplo_ruta.csv
+    ```
+*   **Movimiento Directo por Consola (CLI)**:
+    ```bash
+    # Barrido Lineal (coordenadas articulares en grados)
+    docker compose run scan python src/scan_sync.py --modo cli --tipo-mov lineal \
+        --coord-tipo articulares_deg \
+        --origen 60 -118 -75 -75 89 149 \
+        --destino 132 -108 -87 -72 90 220 \
+        --escanear --velocidad 0.05
+
+    # Arco Circular (coordenadas cartesianas: origen, punto intermedio y destino)
+    docker compose run scan python src/scan_sync.py --modo cli --tipo-mov circular \
+        --coord-tipo cartesianas \
+        --origen 0.40 -0.20 0.15 3.14 0 0 \
+        --via 0.45 -0.18 0.15 3.14 0 0 \
+        --destino 0.50 -0.15 0.15 3.14 0 0 \
+        --escanear
+    ```
+*   **Modo Asistente Interactivo**:
+    ```bash
+    docker compose run scan python src/scan_sync.py --interactivo
+    ```
+*   *(Opcional)* Añadir `--dry-run` para simular la trayectoria sin mover el robot físico.
+    Consulta `routes/README.md` para la guía completa de esquemas y ejemplos.
+
 
 ---
 
@@ -117,8 +147,10 @@ Según el manual oficial del UR10e, siga estos pasos en la consola **PolyScope**
 
 ## 📁 Estructura del Proyecto
 
-*   `src/`: Scripts de control en Python.
-*   `doc/`: Documentación adicional y capturas del proyecto.
-*   `Dockerfile`: Definición de la imagen de compilación.
-*   `docker-compose.yml`: Orquestación de servicios de ejecución.
-*   `GEMINI.md`: Contexto extendido para el desarrollo asistido por IA.
+*   `src/`: Scripts de control y gestión en Python (`scan_sync.py`, `robot_movement.py`, `trajectory_manager.py`, `robot_guard.py`, `gocator.py`, `robot_status.py`).
+*   `routes/`: Definiciones de rutas en formato JSON y CSV, con plantillas de ejemplo (`default_tfg.json`, `ejemplo_ruta_mixta.json`, `ejemplo_ruta.csv`).
+*   `tests/`: Pruebas unitarias automatizadas (`test_trajectory_manager.py`).
+*   `doc/`: Documentación adicional y bitácoras de laboratorio del proyecto.
+*   `Dockerfile`: Definición de la imagen de compilación multi-stage.
+*   `docker-compose.yml`: Orquestación de servicios con montaje de volúmenes en caliente.
+*   `GEMINI.md`: Contexto extendido y directrices de seguridad para desarrollo asistido por IA.
