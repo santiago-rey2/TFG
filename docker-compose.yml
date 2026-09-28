@@ -18,18 +18,22 @@ services:
       context: .
       dockerfile: Dockerfile
     image: robot-movement:0.1
+    stdin_open: true
+    tty: true
     env_file:
       - .env
     volumes:
       - ./src:/app/src
       - ./routes:/app/routes
     command: python src/robot_movement.py
-  
+
   gocator:
     build: 
       context: .
       dockerfile: Dockerfile
     image: robot-gocator:0.1
+    stdin_open: true
+    tty: true
     env_file:
       - .env
     volumes:
