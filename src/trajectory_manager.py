@@ -14,7 +14,6 @@ import csv
 import math
 import os
 import sys
-import numpy as np
 from dataclasses import dataclass, field
 from typing import List, Optional, Dict, Any, Tuple
 
@@ -404,18 +403,18 @@ class TrajectoryManager:
         para permitir que el robot alcance la velocidad constante antes de activar el sensor.
         Basado en ur10e-trajectory-skill.
         """
-        p_in = np.array(pose_inicio[:3])
-        p_out = np.array(pose_fin[:3])
-        v_dir = p_out - p_in
-        dist = np.linalg.norm(v_dir)
+        p_in = [float(v) for v in pose_inicio[:3]]
+        p_out = [float(v) for v in pose_fin[:3]]
+        v_dir = [p_out[i] - p_in[i] for i in range(3)]
+        dist = math.sqrt(sum(x**2 for x in v_dir))
 
         if dist < 1e-6:
             return pose_inicio, pose_fin
 
-        u_dir = v_dir / dist
-        start_ext = p_in - u_dir * (lead_in_mm / 1000.0)
-        end_ext = p_out + u_dir * (lead_out_mm / 1000.0)
+        u_dir = [x / dist for x in v_dir]
+        start_ext = [p_in[i] - u_dir[i] * (lead_in_mm / 1000.0) for i in range(3)]
+        end_ext = [p_out[i] + u_dir[i] * (lead_out_mm / 1000.0) for i in range(3)]
 
-        pose_start_ext = list(start_ext) + pose_inicio[3:]
-        pose_end_ext = list(end_ext) + pose_fin[3:]
+        pose_start_ext = list(start_ext) + list(pose_inicio[3:])
+        pose_end_ext = list(end_ext) + list(pose_fin[3:])
         return pose_start_ext, pose_end_ext
