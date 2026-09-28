@@ -30,6 +30,8 @@ wheels/
 
 # Docker
 .dockerignore
+*.tar
+*.tar.gz
 
 # Sistema Operativo
 .DS_Store
