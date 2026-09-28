@@ -1,152 +1,175 @@
-# Guía Técnica: Despliegue de Contenedores Docker y Operativa en el Laboratorio
-## Proyecto TFG: Perfilómetro Gocator 2600 y Robot UR10e
-
-Esta guía detalla el procedimiento exacto paso a paso para transferir las imágenes Docker y el software desarrollado en el entorno de desarrollo/casa al equipo físico del laboratorio, verificar la comunicación y ejecutar las pruebas de movimiento y escaneo.
+# Guía Técnica: Despliegue en el Computador Embarcado Robotnik y Operativa en Laboratorio
+## Proyecto TFG: Perfilómetro Gocator 2600 y Robot UR10e sobre Plataforma Móvil Robotnik
 
 ---
 
-## 1. Métodos de Transferencia de las Imágenes Docker
+## 1. Arquitectura del Sistema: El Robotnik como Nodo Enlace
 
-Existen dos alternativas dependiendo de si el equipo del laboratorio dispone o no de conexión a Internet.
+En este proyecto, la plataforma móvil **Robotnik** actúa como el computador industrial embarcado (**Onboard IPC**) y centro neurálgico de comunicaciones. Es el único elemento físicamente conectado a la **red interna del robot** que puede interactuar de forma instantánea y simultánea con ambos dispositivos:
 
-### Método A: Exportación Offline a Archivo TAR (Recomendado)
-Este método es el más seguro y rápido, ya que **no requiere conexión a Internet en el laboratorio ni volver a compilar `ur_rtde` ni paquetes C++**.
+```mermaid
+graph TD
+    subgraph "Plataforma Móvil Robotnik (Onboard IPC)"
+        IPC["PC Industrial Robotnik (Linux / Docker)"]
+        D_MOV["Docker: robot-movement (Consola Interactiva / Hot-Reload)"]
+        D_GOC["Docker: robot-gocator (Actuación Láser)"]
+        D_STA["Docker: robot-status (Telemetría RTDE)"]
+        IPC --- D_MOV
+        IPC --- D_GOC
+        IPC --- D_STA
+    end
 
-#### 1. En el ordenador de desarrollo (en casa):
-Ejecutar en la terminal para empaquetar las imágenes ya compiladas en un único archivo:
-```bash
-docker save -o robot_images.tar robot-status:0.1 robot-movement:0.1
+    subgraph "Red Interna Robotnik (192.168.0.x / Switch Gigabit)"
+        IPC -->|RTDE 30004 / Dashboard 29999| UR["Brazo Robótico UR10e (192.168.0.210)"]
+        IPC -->|Socket TCP ASCII 8190| GOC["Perfilómetro Gocator 2600 (192.168.0.10)"]
+    end
+
+    subgraph "Puesto de Control / Operador"
+        LAPTOP["Portátil / PC del Operador"] -.->|SSH / Wi-Fi o Cable Mantenimiento| IPC
+    end
 ```
-*(Opcional: comprimir para que ocupe menos en el pendrive USB: `gzip robot_images.tar`)*.
 
-Copiar al pendrive:
-- El archivo `robot_images.tar` (o `.tar.gz`).
-- El repositorio clonado con los últimos cambios (`git pull` o copia de la carpeta del proyecto).
+### Ventajas de Ejecutar los Contenedores sobre el Robotnik:
+1. **Latencia Mínima (<1 ms):** Conexión por cable de red interna directa entre el Robotnik, el controlador del UR10e y el Gocator 2600.
+2. **Independencia de la Red del Laboratorio:** Al ejecutarse localmente dentro del Robotnik, las caídas de Wi-Fi o saturación de la red externa no afectan a la trayectoria del brazo ni a la captura del perfilómetro.
+3. **Imágenes Ultra Ligeras (216 MB / ~75 MB comprimido):** Diseñadas específicamente para no saturar el almacenamiento en disco de estado sólido del IPC industrial del Robotnik.
 
-#### 2. En el ordenador del laboratorio:
-Copiar el archivo desde el pendrive y cargarlo en el daemon de Docker:
+---
+
+## 2. Empaquetado de las Imágenes Docker (En Casa / Entorno Actual)
+
+Para trasladar **todas las imágenes y contenedores** al Robotnik sin depender de la conexión a Internet del laboratorio:
+
+### 2.1. Guardar Todas las Imágenes en un Único Archivo
+Como todas las imágenes comparten la misma capa base optimizada de 216 MB, Docker las empaqueta conjuntamente de forma ultra compacta:
 ```bash
-docker load -i robot_images.tar
+docker save -o robotnik_tfg_images.tar robot-status:0.1 robot-movement:0.1 robot-gocator:0.1 robot-scan:0.1
 ```
-Verificar que las imágenes están cargadas:
+
+### 2.2. Comprimir para Reducir el Tamaño de Traslado
+```bash
+# Comprime el archivo a ~75 MB
+gzip -9 robotnik_tfg_images.tar
+```
+*Obtendrás `robotnik_tfg_images.tar.gz` (aproximadamente 75 MB).*
+
+---
+
+## 3. Transferencia de Software e Imágenes al Robotnik
+
+### Opción A: Vía Pendrive USB (Física)
+1. Copiar al pendrive:
+   - `robotnik_tfg_images.tar.gz`
+   - La carpeta del proyecto TFG actualizada (con `docker-compose.yml`, `src/`, `routes/`, etc.).
+2. Conectar el pendrive al puerto USB del Robotnik.
+3. Montar y copiar a la carpeta de trabajo del usuario (ej: `/home/robotnik/TFG`).
+
+### Opción B: Vía SCP / Red (Wi-Fi o Cable de Mantenimiento)
+Si te conectas a la red Wi-Fi del Robotnik o conectas tu portátil por cable a su puerto de mantenimiento:
+```bash
+# Copiar imágenes comprimidas al Robotnik
+scp robotnik_tfg_images.tar.gz robotnik@<IP_ROBOTNIK>:~/
+
+# Copiar el repositorio de código actualizado
+scp -r c:/Users/Santi/Documents/GITHUB/TFG robotnik@<IP_ROBOTNIK>:~/
+```
+
+---
+
+## 4. Puesta en Marcha en el Robotnik (En el Laboratorio)
+
+### Paso 1: Conectar por SSH al Robotnik
+Desde tu portátil:
+```bash
+ssh robotnik@<IP_ROBOTNIK>
+cd ~/TFG
+```
+
+### Paso 2: Cargar las Imágenes Docker en el Daemon del Robotnik
+```bash
+# Carga las 4 imágenes en un solo comando
+docker load -i ~/robotnik_tfg_images.tar.gz
+```
+Verificar que están presentes:
 ```bash
 docker images
 ```
-*Deberán aparecer listadas `robot-status:0.1` y `robot-movement:0.1`.*
+*Deberán aparecer listadas `robot-status:0.1`, `robot-movement:0.1`, `robot-gocator:0.1` y `robot-scan:0.1`.*
 
 ---
 
-### Método B: Vía Git + Construcción Local (Si el laboratorio tiene Internet)
-Si el equipo del laboratorio tiene acceso a internet:
-```bash
-git pull origin main
-docker compose build status movement
-```
-*(Gracias a la migración a Debian Bookworm, la compilación de `numpy` y `ur_rtde` se completará en pocos minutos de forma automatizada).*
-
----
-
-## 2. Configuración de Red en el Laboratorio
-
-### 2.1. Tarjeta de Red del PC del Laboratorio
-El PC debe estar configurado con una IP estática dentro del rango de trabajo del robot y el sensor:
-- **IP del PC:** `192.168.0.100` (o similar, terminada entre .100 y .200)
-- **Máscara de subred:** `255.255.255.0`
-- **Puerta de enlace:** Vacía (o según la red del laboratorio)
-
-### 2.2. Archivo de Variables de Entorno (`.env`)
-Dado que el archivo `.env` está en `.gitignore` por seguridad, al llegar al laboratorio se debe crear en la raíz del proyecto:
-```bash
-# Crear o editar archivo .env
-cat <<EOF > .env
+### Paso 3: Configurar el Archivo `.env` en el Robotnik
+En la raíz de `~/TFG`, crear o verificar el archivo `.env`:
+```env
 ROBOT_IP=192.168.0.210
 GOCATOR_IP=192.168.0.10
 GOCATOR_PORT=8190
 SWEEP_TIME=30
-EOF
 ```
 
 ---
 
-## 3. Preparación del Robot UR10e (Teach Pendant)
-
-Antes de lanzar cualquier comando que intente mover el robot:
-1. **Encender el Robot:** Pulsar el botón verde en el Teach Pendant y liberar los frenos (modo Normal / Running).
-2. **Activar Modo Remoto:**
-   - En la esquina superior derecha de la interfaz de Polyscope, pulsar sobre el icono del mando / robot.
-   - Seleccionar **"Remote Control" (Control Remoto)**.
-   - *Nota:* Si el robot no está en modo remoto, responderá al estado y telemetría, pero rechazará las órdenes cinemáticas de movimiento.
+### Paso 4: Preparar el Teach Pendant del UR10e
+1. Encender el robot y liberar los frenos en el Pendant.
+2. En la esquina superior derecha de Polyscope, pulsar sobre el icono del mando y seleccionar **"Remote Control" (Control Remoto)**.
 
 ---
 
-## 4. Secuencia de Verificación y Puesta en Marcha
-
-### Paso 1: Diagnóstico Rápido de Comunicación (Sin mover el robot)
-Desde la terminal del PC del laboratorio, ejecutar el script de comprobación general:
+### Paso 5: Diagnóstico Rápido de Comunicación desde el Robotnik
+Antes de mover el robot, verificar que el Robotnik tiene acceso instantáneo a ambos dispositivos por su red interna:
 ```bash
-python src/robot_check_connection.py --ip 192.168.0.210
-```
-**Comprobar que indique:**
-- `Dashboard Server (29999): OK` (Robotmode: RUNNING, Remote Control: `true`)
-- `Telemetría Real-time (30003): OK` (500 Hz, muestra articulaciones reales)
-- `Puerto RTDE (30004): ABIERTO`
+# 1. Comprobar robot UR10e (puertos 29999, 30003, 30004)
+python3 src/robot_check_connection.py --ip 192.168.0.210
 
-Verificar también la disponibilidad del sensor láser:
-```bash
-python src/gocator.py --status
-```
-*(Debe reportar `Disponible: True` y latencia en ms).*
+# 2. Comprobar perfilómetro Gocator (puerto 8190)
+python3 src/gocator.py --status
 
----
-
-### Paso 2: Comprobación del Contenedor Docker de Telemetría
-Verificar que el contenedor Docker montado conecta por RTDE nativo con el robot físico:
-```bash
+# 3. Comprobar telemetría nativa RTDE desde el contenedor Docker
 docker compose run --rm status
 ```
-Debe devolver la telemetría en tiempo real, temperaturas de juntas y estado seguro.
+*Si los 3 comandos responden `OK / DISPONIBLE`, el enlace interno del Robotnik está 100% verificado.*
 
 ---
 
-### Paso 3: Operativa Desacoplada en Laboratorio (Dos Terminales)
+## 5. Operativa Desacoplada sobre el Robotnik (Dos Terminales)
 
-#### Terminal 1 — Control del Brazo UR10e:
-Lanzar la consola interactiva dentro de Docker:
+Para operar de forma independiente el movimiento del brazo y la actuación del láser sobre el Robotnik, se recomienda abrir **dos sesiones SSH** (o usar `tmux` / `screen`):
+
+### Terminal SSH 1 (Control del Brazo Robótico):
 ```bash
 docker compose run --rm movement
 ```
-*(O directamente en host si se dispone de Python: `python src/robot_movement.py -i --json routes/default_tfg.json`)*.
+*(O de forma nativa: `python3 src/robot_movement.py -i --json routes/default_tfg.json`)*.
 
-**Flujo en la Consola Interactiva:**
-1. Pulsar `[5]` para ver la posición y pose actual.
-2. Pulsar `[2]` para posicionar suavemente en el punto de **ORIGEN / HOME** sin barrido.
-3. Comprobar visualmente la alineación con la probeta.
-4. Si se necesitan ajustar cotas, editar `routes/default_tfg.json` o `routes/ejemplo_ruta.csv` en el editor, guardar, y en la consola pulsar `[3]` (**Hot-Reload**) para recargar al instante sin reconectar RTDE.
-5. Pulsar `[1]` para ejecutar la trayectoria.
+**Acciones disponibles en la Consola Interactiva:**
+* `[5]` : Consultar telemetría y pose actual del robot.
+* `[2]` : Mover a posición de **ORIGEN / HOME** para comprobar y alinear la probeta.
+* `[3]` : **Hot-Reload:** Si editas `routes/default_tfg.json` o cualquier archivo en `routes/`, pulsa `[3]` para recargar las coordenadas inmediatamente en memoria sin reiniciar la conexión RTDE.
+* `[1]` : Ejecutar la trayectoria de barrido horizontal plana.
 
-#### Terminal 2 — Actuación del Perfilómetro Láser Gocator 2600:
-En una segunda terminal independiente:
+---
+
+### Terminal SSH 2 (Actuación del Láser Gocator):
 ```bash
-# Opción A: Barrido temporizado de 30 segundos (ideal para coordinar con el movimiento del robot)
-python src/gocator.py --sweep 30
+# Modo A: Disparo de barrido temporizado de 30 segundos
+docker compose run --rm gocator python src/gocator.py --sweep 30
 
-# Opción B: Consola interactiva del sensor (encender / apagar manualmente)
-python src/gocator.py -i
+# Modo B: Consola interactiva del sensor (encender / apagar manualmente)
+docker compose run --rm gocator python src/gocator.py -i
 
-# Opción C: Encendido directo
-python src/gocator.py --cmd start
-# ... realizar escaneo ...
-python src/gocator.py --cmd stop
+# Modo C: Encendido y apagado directo por comandos
+docker compose run --rm gocator python src/gocator.py --cmd start
+# ... observar emisión láser o ajustar exposición en GoPxL ...
+docker compose run --rm gocator python src/gocator.py --cmd stop
 ```
 
 ---
 
-## 5. Tabla de Solución de Problemas Comunes
+## 6. Resolución de Problemas Frecuentes en el Robotnik
 
-| Síntoma / Error | Causa Probable | Solución |
+| Incidencia | Causa Probable | Solución |
 | :--- | :--- | :--- |
-| `El robot rechazó la conexión o control` | El Teach Pendant no está en modo remoto. | Cambiar en la pantalla táctil de Polyscope a modo "Remote Control". |
-| `Protective Stop activo` | El robot detectó colisión previa o límite singular. | Desbloquear desde el Teach Pendant antes de reintentar. |
-| `Gocator Timeout / No responde` | IP incorrecta o cable Ethernet desconectado. | Comprobar con `ping 192.168.0.10` y revisar puerto 8190 en GoPxL. |
-| `Z no constante / trayectoria inclinada` | Restricción Z desactivada. | Asegurar que `force_constant_z: true` en el JSON o no pasar `--sin-z-constante`. |
-| `Docker: network not found` | Primera ejecución de docker compose. | Se crea automáticamente al hacer `docker compose run --rm status`. |
+| `El robot rechaza órdenes de movimiento` | Teach Pendant no está en modo remoto. | Activar "Remote Control" en el botón superior derecho de Polyscope. |
+| `Protective Stop activo en UR10e` | Parada de protección por singularidad o toque. | Desbloquear desde la pantalla del Teach Pendant. |
+| `Gocator Timeout en 192.168.0.10` | Cable de red interna desconectado del switch del Robotnik. | Comprobar cable Ethernet y ejecutar `ping 192.168.0.10` desde el Robotnik. |
+| `Permiso denegado en Docker` | El usuario robotnik no está en el grupo `docker`. | Ejecutar con `sudo docker compose ...` o añadir usuario: `sudo usermod -aG docker $USER`. |

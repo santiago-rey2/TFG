@@ -7,17 +7,24 @@ Este proyecto está siendo desarrollado por un estudiante de 4º curso de Ingeni
 El objetivo principal es el análisis de los datos obtenidos mediante el escaneo de un perfilómetro de masas **Gocator 2600** integrado en un brazo robótico **UR10e**.
 
 ## Estado Actual (Abril 2026)
-- **Comunicación:** Se utiliza el protocolo **ur_rtde** para interactuar con el UR10e.
+- **Plataforma y Hardware:**
+    - El brazo robótico **UR10e** y el perfilómetro **Gocator 2600** están montados sobre una plataforma móvil **Robotnik**.
+    - El computador industrial embarcado (**Onboard IPC del Robotnik**) actúa como nodo central y enlace exclusivo, comunicándose instantáneamente con ambos dispositivos a través de su red interna Gigabit Ethernet.
+- **Comunicación:**
+    - Se utiliza el protocolo **ur_rtde** para interactuar con el UR10e (puerto 30004 y telemetría 30003).
+    - Protocolo de comandos ASCII TCP/IP para el perfilómetro Gocator (puerto 8190).
 - **Scripts de Control (`src/`):**
-    - `robot_status.py`: Consulta el estado actual del robot (articulaciones y pose TCP).
-    - `robot_movement.py`: Ejecuta una trayectoria lineal (`moveL`) entre coordenadas de origen y fin específicas.
+    - `robot_status.py`: Consulta telemetría en tiempo real (articulaciones, pose TCP y temperaturas).
+    - `robot_movement.py`: Control cinemático independiente con consola interactiva y recarga en caliente (*hot-reload*) de rutas JSON/CSV.
+    - `gocator.py`: Actuación independiente del láser (comandos CLI, barridos temporizados y consola interactiva).
+    - `robot_check_connection.py`: Diagnóstico rápido multi-puerto (29999, 30003, 30004, 6080, 8190).
 - **Lógica de Trayectoria:**
-    - Se utilizan coordenadas en grados (convertidas a radianes en el script).
-    - **Movimiento Plano:** El script de movimiento sobreescribe automáticamente la coordenada Z del destino con la del origen para garantizar que el desplazamiento sea perfectamente horizontal.
-- **Infraestructura:**
-    - El proyecto está dockerizado para asegurar la compatibilidad de dependencias (`cmake`, `boost`).
-    - Se utiliza `docker-compose` para orquestar los servicios `status` y `movement`.
-    - La configuración de la red (IP del robot) se gestiona mediante un archivo `.env` (ignorado en git).
+    - Carga dinámica desde archivos JSON y CSV en `routes/`.
+    - **Movimiento Plano:** Forzado automático de altura Z constante para escaneos horizontales.
+- **Infraestructura Docker:**
+    - Imágenes ultra ligeras optimizadas a **216 MB** (~75 MB comprimidas en tar.gz) para no saturar el almacenamiento del IPC del Robotnik.
+    - Orquestación mediante `docker-compose` con soporte TTY para sesiones interactivas desacopladas.
+    - Configuración de red mediante archivo `.env` (ignorado en git).
 
 ## Coordenadas de Referencia (TFG)
 | Articulación | Origen (°) | Fin (°) |
