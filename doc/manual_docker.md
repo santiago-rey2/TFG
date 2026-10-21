@@ -20,7 +20,7 @@ El sistema de control está diseñado para operar en una arquitectura ciberfísi
 
 ## 2. Anatomía de la Construcción Multi-Stage (`Dockerfile`)
 
-El archivo [Dockerfile](file:///c:/Users/Santi/Documents/GITHUB/TFG/Dockerfile) utiliza una estrategia de dos fases (*Multi-Stage Build*) basada en Debian Bookworm:
+El archivo [Dockerfile](../Dockerfile) utiliza una estrategia de dos fases (*Multi-Stage Build*) basada en Debian Bookworm:
 
 ```dockerfile
 # ==========================================
@@ -65,13 +65,13 @@ CMD ["python", "src/main.py"]
 ```
 
 ### Papel de `.dockerignore`:
-El archivo [.dockerignore](file:///c:/Users/Santi/Documents/GITHUB/TFG/.dockerignore) excluye la carpeta de control de versiones `.git`, la documentación `doc/`, los entornos virtuales locales y archivos temporales. Esto reduce el contexto enviado al Docker daemon de más de 100 MB a menos de **500 KB**, acelerando la construcción drásticamente.
+El archivo [.dockerignore](../.dockerignore) excluye la carpeta de control de versiones `.git`, la documentación `doc/`, los entornos virtuales locales y archivos temporales. Esto reduce el contexto enviado al Docker daemon de más de 100 MB a menos de **500 KB**, acelerando la construcción drásticamente.
 
 ---
 
 ## 3. Paso 1: Construcción de la Imagen desde Cero (Máquina de Desarrollo)
 
-Desde el directorio raíz del proyecto (`c:\Users\Santi\Documents\GITHUB\TFG` o equivalente en Linux/macOS), ejecuta la construcción mediante Docker Compose o Docker CLI directo:
+Desde el directorio raíz del proyecto (raíz del repositorio clonado), ejecuta la construcción mediante Docker Compose o Docker CLI directo:
 
 ### Opción A (Recomendada con Docker Compose):
 ```bash

@@ -15,7 +15,7 @@ Durante las primeras fases de pruebas en laboratorio (Días 1 a 7), el software 
 Por estos motivos, en el **Día 8** se ejecutó una **refactorización integral**:
 - **Eliminación limpia de código obsoleto:** Se eliminaron los scripts monolíticos antiguos y las carpetas `routes/` y `tests/`.
 - **Estructura Modular (`src/`):** Descomposición funcional en **8 módulos independientes**, cada uno con una responsabilidad única y aislada.
-- **Orquestador CLI Interactivo:** Un punto de entrada único ([`src/main.py`](file:///c:/Users/Santi/Documents/GITHUB/TFG/src/main.py)) que canaliza todas las funciones sin reinicios de sesión.
+- **Orquestador CLI Interactivo:** Un punto de entrada único ([`src/main.py`](../src/main.py)) que canaliza todas las funciones sin reinicios de sesión.
 
 ---
 
@@ -45,42 +45,42 @@ A continuación se detallan las funciones de la API de Universal Robots implemen
   - `X, Y, Z`: Coordenadas de posición del Tool Center Point (TCP) respecto al sistema de coordenadas de la base del robot (en metros).
   - `Rx, Ry, Rz`: Vector de rotación eje-ángulo (en radianes), donde la dirección del vector define el eje de rotación y su magnitud $\|\vec{R}\|$ define el ángulo girado.
 - **Por qué se usa:** Es la función más precisa y de menor latencia para conocer la localización espacial real de la herramienta en cualquier instante.
-- **Módulos donde se usa:** [`check_pose.py`](file:///c:/Users/Santi/Documents/GITHUB/TFG/src/check_pose.py), [`teach_mode.py`](file:///c:/Users/Santi/Documents/GITHUB/TFG/src/teach_mode.py), [`points_manager.py`](file:///c:/Users/Santi/Documents/GITHUB/TFG/src/points_manager.py).
+- **Módulos donde se usa:** [`check_pose.py`](../src/check_pose.py), [`teach_mode.py`](../src/teach_mode.py), [`points_manager.py`](../src/points_manager.py).
 
 #### 3.2. `RTDEControlInterface.moveL(pose, speed, acceleration, asynchronous=True)`
 - **Qué hace:** Envía al controlador de movimiento del UR10e una orden de interpolación lineal en el espacio cartesiano. La herramienta se desplaza en línea recta desde su pose actual hasta `pose` con la velocidad máxima y aceleración especificadas.
 - **Por qué el parámetro `asynchronous=True` es crítico:**
   - En modo síncrono (`asynchronous=False`), la llamada a `moveL` bloquea el hilo de Python hasta que el robot finaliza físicamente el movimiento. Durante ese tiempo, **Python queda congelado**, haciendo imposible detectar pulsaciones de teclado o reaccionar a emergencias.
   - Al activar `asynchronous=True`, `moveL` entrega la trayectoria al planificador cinemático del robot y devuelve inmediatamente el control al programa Python, permitiendo ejecutar un bucle de supervisión en tiempo real.
-- **Módulos donde se usa:** [`move_to_point.py`](file:///c:/Users/Santi/Documents/GITHUB/TFG/src/move_to_point.py).
+- **Módulos donde se usa:** [`move_to_point.py`](../src/move_to_point.py).
 
 #### 3.3. `RTDEControlInterface.isSteady()`
 - **Qué hace:** Consulta al controlador si el brazo se encuentra actualmente quieto (velocidad y aceleración nulas en todas sus articulaciones).
 - **Por qué se usa:** Al operar en modo asíncrono, se utiliza como condición de parada del bucle de supervisión (`while not rtde_ctrl.isSteady():`). Permite saber de manera determinista cuándo el robot ha terminado su trayectoria sin recurrir a cálculos imprecisos de tiempo (`time.sleep`).
-- **Módulos donde se usa:** [`move_to_point.py`](file:///c:/Users/Santi/Documents/GITHUB/TFG/src/move_to_point.py).
+- **Módulos donde se usa:** [`move_to_point.py`](../src/move_to_point.py).
 
 #### 3.4. `RTDEControlInterface.stopL(deceleration)`
 - **Qué hace:** Detiene de forma controlada el movimiento lineal del robot aplicando la desaceleración máxima en $m/s^2$ pasada por parámetro (se utiliza `10.0` $m/s^2$).
 - **Por qué se usa:** A diferencia de una parada de emergencia por desconexión de relé o corte eléctrico (que dispara los frenos mecánicos bruscamente desgastando las reductoras armónicas), `stopL` utiliza los servomotores para frenar suavemente pero en cuestión de milisegundos, manteniendo el robot alimentado y en posición fija.
-- **Módulos donde se usa:** [`move_to_point.py`](file:///c:/Users/Santi/Documents/GITHUB/TFG/src/move_to_point.py).
+- **Módulos donde se usa:** [`move_to_point.py`](../src/move_to_point.py).
 
 #### 3.5. `RTDEControlInterface.teachMode()` y `endTeachMode()`
 - **Qué hace:**
   - `teachMode()`: Activa el algoritmo interno de compensación de gravedad y modelo dinámico del UR10e, desengranando los frenos para que el usuario pueda mover el brazo con la mano libremente (Freedrive).
   - `endTeachMode()`: Desactiva el modo de guiado manual y restablece el control activo de posición en las articulaciones.
 - **Por qué se usa:** Permite calibrar posiciones físicas complejas en planta llevando la herramienta manualmente sobre la pieza y guardando el punto exacto sin tener que estimar coordenadas numéricas a ciegas.
-- **Módulos donde se usa:** [`teach_mode.py`](file:///c:/Users/Santi/Documents/GITHUB/TFG/src/teach_mode.py).
+- **Módulos donde se usa:** [`teach_mode.py`](../src/teach_mode.py).
 
 #### 3.6. `RTDEControlInterface.stopScript()`
 - **Qué hace:** Finaliza la ejecución del hilo secundario de control (*control script*) que `ur_rtde` inyecta en el robot para comunicarse.
 - **Por qué se usa:** Se ubica en los bloques `finally` de cada módulo para asegurar que, tanto si el script termina con éxito como si se produce una excepción, la conexión quede liberada y el controlador PolyScope del UR10e no quede bloqueado para sesiones posteriores.
-- **Módulos donde se usa:** [`move_to_point.py`](file:///c:/Users/Santi/Documents/GITHUB/TFG/src/move_to_point.py), [`teach_mode.py`](file:///c:/Users/Santi/Documents/GITHUB/TFG/src/teach_mode.py).
+- **Módulos donde se usa:** [`move_to_point.py`](../src/move_to_point.py), [`teach_mode.py`](../src/teach_mode.py).
 
 ---
 
 ### 4. Detalle Técnico Módulo por Módulo, Código y Salidas CLI
 
-A continuación se desglosan los 8 módulos desarrollados en [`src/`](file:///c:/Users/Santi/Documents/GITHUB/TFG/src), explicando su código fuente, su algoritmo interno y las salidas reales obtenidas en la consola.
+A continuación se desglosan los 8 módulos desarrollados en [`src/`](../src), explicando su código fuente, su algoritmo interno y las salidas reales obtenidas en la consola.
 
 ---
 

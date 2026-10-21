@@ -4,8 +4,8 @@
 ### 1. Objetivos del Día
 - Simplificar temporalmente la arquitectura para facilitar pruebas de laboratorio y calibración.
 - Separar la ejecución en dos archivos 100% independientes:
-  - Movimiento del brazo robótico UR10e ([`src/robot_movement.py`](file:///c:/Users/Santi/Documents/GITHUB/TFG/src/robot_movement.py)).
-  - Actuación del perfilómetro láser Gocator 2600 ([`src/gocator.py`](file:///c:/Users/Santi/Documents/GITHUB/TFG/src/gocator.py)).
+  - Movimiento del brazo robótico UR10e ([`src/robot_movement.py`](../src/robot_movement.py)).
+  - Actuación del perfilómetro láser Gocator 2600 ([`src/gocator.py`](../src/gocator.py)).
 - Mantener la carga dinámica de coordenadas y rutas desde archivos JSON y CSV.
 - Implementar **Modo Consola Interactiva (Opción C)** con recarga en caliente (*hot-reload*) de archivos sin necesidad de reconectar la sesión RTDE del robot.
 
