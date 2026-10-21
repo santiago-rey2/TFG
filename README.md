@@ -56,7 +56,7 @@ cp .env.example .env
 ```
 Edita la IP del controlador del robot (URSim o Robot Físico):
 ```env
-ROBOT_IP=192.168.1.224
+ROBOT_IP=192.168.1.210
 ```
 
 > [!IMPORTANT]
@@ -71,28 +71,14 @@ Para que el UR10e acepte comandos de movimiento externos vía RTDE:
 
 ## 🚀 Guía de Ejecución
 
-### Opción A: Ejecución mediante Docker (Recomendada en Robotnik IPC)
-
-1. **Construir la imagen optimizada:**
-   ```bash
-   docker compose build
-   ```
-
-2. **Lanzar la consola interactiva (TTY):**
-   ```bash
-   docker compose run --rm ur10e-control
-   ```
-   *(El flag `--rm` elimina el contenedor efímero al salir, manteniendo limpio el sistema).*
-
-### Opción B: Ejecución Directa en Host (con entorno Python local)
+Para iniciar la sesión interactiva en la consola del robot, ejecuta el contenedor en Docker:
 
 ```bash
-python src/main.py
+docker compose run --rm ur10e-control
 ```
-*También es posible especificar directamente un archivo de puntos activo al arrancar:*
-```bash
-python src/main.py points/mi_escaneo.json
-```
+
+> [!NOTE]
+> El flag `--rm` asegura que el contenedor efímero se elimine automáticamente al salir, liberando recursos en el computador embarcado (IPC).
 
 ---
 
@@ -146,7 +132,7 @@ Se conecta en tiempo real al robot vía RTDE (puerto 30004) con fallback al sock
 
 **Salida en consola:**
 ```text
-[*] Conectando con UR10e en 192.168.1.224 para consultar pose TCP actual...
+[*] Conectando con UR10e en 192.168.1.210 para consultar pose TCP actual...
 [OK] Pose TCP obtenida vía RTDE:
   Pose Vector: [-0.462130, -0.103808, 0.169564, 1.809200, 1.901000, 0.562500]
   Coordenadas cartesianas (m)  : X = -0.462130 | Y = -0.103808 | Z = 0.169564
@@ -179,7 +165,7 @@ Selecciona setup [1-2] (Enter para 'movement'): 1
 
 [!] >> Pulsa [ENTER] o [ESPACIO] para PARAR el robot en cualquier momento <<
 
-[*] Conectando con UR10e en 192.168.1.224...
+[*] Conectando con UR10e en 192.168.1.210...
 
 [OK] Movimiento a 'origin' completado con éxito.
 [*] Conexión liberada.
@@ -189,7 +175,7 @@ Selecciona setup [1-2] (Enter para 'movement'): 1
 ```text
 [!] >> Pulsa [ENTER] o [ESPACIO] para PARAR el robot en cualquier momento <<
 
-[*] Conectando con UR10e en 192.168.1.224...
+[*] Conectando con UR10e en 192.168.1.210...
 
 [PARADA DE EMERGENCIA] ¡Pulsación detectada! Frenando el robot...
 [ALERTA] Movimiento hacia 'origin' DETENIDO por el usuario.
@@ -203,7 +189,7 @@ Activa la función `teachMode()` de RTDE, desengranando los frenos para mover el
 
 **Salida en consola:**
 ```text
-[*] Conectando con UR10e en 192.168.1.224...
+[*] Conectando con UR10e en 192.168.1.210...
 [*] Activando teachMode() (Modo Guiado Manual / Freedrive)...
 
 =======================================================
@@ -218,7 +204,7 @@ Activa la función `teachMode()` de RTDE, desengranando los frenos para mover el
 [*] Conexión liberada.
 
 --- NUEVA POSICIÓN DEL ROBOT TRAS GUIADO MANUAL ---
-[*] Conectando con UR10e en 192.168.1.224 para consultar pose TCP actual...
+[*] Conectando con UR10e en 192.168.1.210 para consultar pose TCP actual...
 [OK] Pose TCP obtenida vía RTDE:
   Pose Vector: [-0.462130, -0.350120, 0.169564, 1.809200, 1.901000, 0.562500]
   Coordenadas cartesianas (m)  : X = -0.462130 | Y = -0.350120 | Z = 0.169564
@@ -241,7 +227,7 @@ Captura la posición actual del robot y la añade al archivo activo. Si no se in
 
 **Salida en consola:**
 ```text
-[*] Conectando con UR10e en 192.168.1.224 para consultar pose TCP actual...
+[*] Conectando con UR10e en 192.168.1.210 para consultar pose TCP actual...
 [OK] Pose TCP obtenida vía RTDE:
   Pose Vector: [-0.462130, -0.103808, 0.169564, 1.809200, 1.901000, 0.562500]
   Coordenadas cartesianas (m)  : X = -0.462130 | Y = -0.103808 | Z = 0.169564
