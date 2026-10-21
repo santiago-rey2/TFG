@@ -25,7 +25,7 @@ El objetivo principal es el control cinemático de alta precisión, la captura d
 
 ```text
 ├── config/
-│   └── movement_config.json    # Perfiles de dinámica (movement y scan: velocidad y aceleración)
+│   └── movement_config.json    # Perfiles de dinámica protegidos de solo lectura (:ro) (velocidad y aceleración)
 ├── points/
 │   └── points.json             # Almacén de coordenadas cartesianas (modificable en caliente y en parado)
 ├── src/
@@ -334,4 +334,5 @@ Saliendo del orquestador.
 
 1. **Parada de Emergencia:** Mantén siempre accesible el teclado de la consola o la parada de emergencia física (seta de parada) del UR10e durante las pruebas en laboratorio.
 2. **Plano de Altura Constante ($Z$):** Para operaciones que requieran mantener una distancia de trabajo fija, verifica que la coordenada $Z$ permanezca constante durante todo el recorrido.
-3. **Mantenimiento de Imágenes:** No modificar la estructura de capas del `Dockerfile` para no incrementar el tamaño de la imagen sobre los 216 MB optimizados.
+3. **Protección de Dinámicas:** El directorio `config/` se monta en modo solo lectura (`:ro`) para impedir alteraciones de velocidad y aceleración fuera de los umbrales seguros calibrados para el UR10e.
+4. **Mantenimiento de Imágenes:** No modificar la estructura de capas del `Dockerfile` para no incrementar el tamaño de la imagen sobre los 216 MB optimizados.

@@ -1,6 +1,7 @@
 """
 Módulo de gestión de configuraciones de movimiento.
 Carga y valida los perfiles de dinámica (velocidad y aceleración) desde config/movement_config.json.
+Este archivo es estrictamente de solo lectura (read-only) para preservar los límites de seguridad física del robot.
 """
 
 import os

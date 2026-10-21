@@ -11,6 +11,6 @@ services:
       - .env
     volumes:
       - ./src:/app/src
-      - ./config:/app/config
+      - ./config:/app/config:ro
       - ./points:/app/points
     command: python src/main.py
