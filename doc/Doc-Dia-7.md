@@ -92,3 +92,5 @@ Se realizaron pruebas de conexión exhaustivas contra el emulador URSim en la re
    ```bash
    docker compose run --rm status
    ```
+
+   https://sdurobotics.gitlab.io/ur_rtde/pages/reference/api.html

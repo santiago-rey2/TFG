@@ -13,14 +13,15 @@ El objetivo principal es el análisis de los datos obtenidos mediante el escaneo
 - **Comunicación:**
     - Se utiliza el protocolo **ur_rtde** para interactuar con el UR10e (puerto 30004 y telemetría 30003).
     - Protocolo de comandos ASCII TCP/IP para el perfilómetro Gocator (puerto 8190).
-- **Scripts de Control (`src/`):**
-    - `robot_status.py`: Consulta telemetría en tiempo real (articulaciones, pose TCP y temperaturas).
-    - `robot_movement.py`: Control cinemático independiente con consola interactiva y recarga en caliente (*hot-reload*) de rutas JSON/CSV.
-    - `gocator.py`: Actuación independiente del láser (comandos CLI, barridos temporizados y consola interactiva).
-    - `robot_check_connection.py`: Diagnóstico rápido multi-puerto (29999, 30003, 30004, 6080, 8190).
-- **Lógica de Trayectoria:**
-    - Carga dinámica desde archivos JSON y CSV en `routes/`.
-    - **Movimiento Plano:** Forzado automático de altura Z constante para escaneos horizontales.
+- **Arquitectura Modular de Control (`src/`):**
+    - `main.py`: Orquestador principal interactivo que coordina todos los módulos.
+    - `points_manager.py`: Carga, gestión, selección dinámica y serialización compacta de archivos de puntos (`points/*.json`) con nombrado automático/incremental (`PointN`).
+    - `config_manager.py`: Carga y selección dinámica de perfiles de dinámica de movimiento (`config/movement_config.json`).
+    - `keyboard_listener.py`: Captura multiplataforma de pulsaciones ([ENTER] / [ESPACIO]) para paradas de emergencia en tiempo real sin bloquear la ejecución.
+    - `check_pose.py`: Consulta en tiempo real de la pose TCP actual del UR10e (RTDE y socket 30003).
+    - `move_to_point.py`: Ejecución de trayectorias lineales (`moveL`) a puntos con frenado de emergencia inmediato.
+    - `teach_mode.py`: Activación y desactivación del modo guiado manual libre (`teachMode` y `endTeachMode`) con opción de guardado directo.
+    - `offset_calculator.py`: Cálculo experimental de puntos finales aplicando desplazamientos relativos (offsets XYZ) a partir de una pose TCP origen.
 - **Infraestructura Docker:**
     - Imágenes ultra ligeras optimizadas a **216 MB** (~75 MB comprimidas en tar.gz) para no saturar el almacenamiento del IPC del Robotnik.
     - Orquestación mediante `docker-compose` con soporte TTY para sesiones interactivas desacopladas.
