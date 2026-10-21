@@ -15,7 +15,7 @@ El objetivo principal es el control cinemático de alta precisión, la captura d
 * **Orquestador Interactivo en CLI:** Menú centralizado para inspeccionar poses, ejecutar trayectorias, guiar manualmente el brazo y calcular puntos relativos.
 * **Parada de Emergencia Inmediata:** Monitoreo en hilo paralelo no bloqueante durante movimientos lineales; presionar `[ENTER]` o `[ESPACIO]` frena el robot al instante (`stopL`).
 * **Modo Guiado Manual (Teach Mode / Freedrive):** Activación de guiado libre con la mano desde la consola y guardado directo de la pose fijada.
-* **Gestión Dinámica de Puntos (`PointN`):** Almacenamiento y conmutación en caliente de múltiples archivos de posiciones `.json`, con nombrado incremental automático (`Point1`, `Point2`, etc.) si no se especifica etiqueta.
+* **Gestión Dinámica de Puntos (`PointN`) y Edición en Caliente:** Almacenamiento y conmutación de archivos de posiciones `.json`. Los archivos de puntos son **modificables tanto con la aplicación en ejecución como en parado**, reflejándose cualquier cambio de forma inmediata sin reiniciar el contenedor.
 * **Cálculo Experimental por Offset XYZ:** Determinación matemática de puntos de llegada aplicando traslaciones relativas en función de las dimensiones de la pieza.
 * **Contenedor Ultraligero:** Imagen Docker multi-stage optimizada (~216 MB) para preservar el almacenamiento y recursos del IPC del Robotnik.
 
@@ -27,7 +27,7 @@ El objetivo principal es el control cinemático de alta precisión, la captura d
 ├── config/
 │   └── movement_config.json    # Perfiles de dinámica (movement y scan: velocidad y aceleración)
 ├── points/
-│   └── points.json             # Almacén de coordenadas cartesianas [X, Y, Z, Rx, Ry, Rz]
+│   └── points.json             # Almacén de coordenadas cartesianas (modificable en caliente y en parado)
 ├── src/
 │   ├── main.py                 # Orquestador principal y menú interactivo CLI
 │   ├── check_pose.py           # Consulta en tiempo real de la pose TCP (RTDE y socket 30003)
@@ -107,6 +107,9 @@ Elige una opción [1-8]:
 
 ### [1] Listar puntos disponibles
 Lee el archivo de puntos actualmente activo y muestra los nombres de los puntos guardados, sus descripciones y sus coordenadas cartesianas de pose `[X, Y, Z, Rx, Ry, Rz]`.
+
+> [!TIP]
+> **Edición en Caliente y en Parado:** El archivo `points.json` (o cualquier otro archivo `.json` en `points/`) puede ser editado, ampliado o modificado manualmente **tanto con la aplicación en ejecución como en parado**. Gracias al montaje de volúmenes de Docker (`./points:/app/points`), el sistema lee directamente del disco en cada operación, por lo que cualquier cambio externo se reflejará de forma inmediata sin reiniciar el contenedor.
 
 **Salida en consola:**
 ```text
