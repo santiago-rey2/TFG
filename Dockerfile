@@ -33,6 +33,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 WORKDIR /app
 COPY src/ ./src/
-COPY routes/ ./routes/
+COPY config/ ./config/
+COPY points/ ./points/
 
-CMD ["python", "src/robot_status.py"]
+CMD ["python", "src/main.py"]

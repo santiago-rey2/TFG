@@ -1,56 +1,16 @@
 services:
-  # Servicio para comprobar el estado del robot y telemetría
-  status:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: robot-status:0.1
-    env_file:
-      - .env
-    volumes:
-      - ./src:/app/src
-      - ./routes:/app/routes
-    command: python src/robot_status.py
-
   # Servicio para ejecutar la trayectoria de escaneo plana
-  movement:
+  ur10e-control:
     build:
       context: .
       dockerfile: Dockerfile
-    image: robot-movement:0.1
+    image: ur10e-control:0.1
     stdin_open: true
     tty: true
     env_file:
       - .env
     volumes:
       - ./src:/app/src
-      - ./routes:/app/routes
-    command: python src/robot_movement.py
-
-  gocator:
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    image: robot-gocator:0.1
-    stdin_open: true
-    tty: true
-    env_file:
-      - .env
-    volumes:
-      - ./src:/app/src
-      - ./routes:/app/routes
-    command: python src/gocator.py
-
-  # Servicio para realizar el escaneo sincronizado (Robot + Gocator)
-  scan:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: robot-scan:0.1
-    env_file:
-      - .env
-    volumes:
-      - ./src:/app/src
-      - ./routes:/app/routes
-    command: python src/scan_sync.py
-
+      - ./config:/app/config
+      - ./points:/app/points
+    command: python src/main.py

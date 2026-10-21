@@ -1,0 +1,15 @@
+{
+  "setups": {
+    "movement": {
+      "description": "Standard velocity for positioning and general movements",
+      "speed": 0.05,
+      "acceleration": 0.2
+    },
+    "scan": {
+      "description": "Slow and stable velocity for profilometer scan acquisition",
+      "speed": 0.008,
+      "acceleration": 0.1
+    }
+  },
+  "default_setup": "movement"
+}

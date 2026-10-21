@@ -1,0 +1,28 @@
+{
+  "points": {
+    "origin": {
+      "description": "Reference origin point for TFG scans",
+      "pose": [-0.46213, -0.103808, 0.169564, 1.8092, 1.901, 0.5625]
+    },
+    "end": {
+      "description": "Reference end point for TFG scans (synchronized Z)",
+      "pose": [-0.46213, -0.403808, 0.169564, 1.8092, 1.901, 0.5625]
+    },
+    "middle": {
+      "description": "Reference middle point for TFG scans (synchronized Z)",
+      "pose": [-0.46213, -0.403808, 0.169564, 1.8092, 1.901, 0.5625]
+    },
+    "Point1": {
+      "description": "",
+      "pose": [-0.46213, -0.103808, 0.169564, 1.8092, 1.901, 0.5625]
+    },
+    "Point2": {
+      "description": "",
+      "pose": [-0.46213, -0.103808, 0.169564, 1.8092, 1.901, 0.5625]
+    },
+    "Point3": {
+      "description": "Offset desde Pose_Actual_Robot (dx=+0.0000, dy=-0.4000, dz=+0.0000)",
+      "pose": [-0.46213, -0.503808, 0.169564, 1.8092, 1.901, 0.5625]
+    }
+  }
+}
