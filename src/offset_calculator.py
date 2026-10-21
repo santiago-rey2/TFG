@@ -149,9 +149,8 @@ def calcular_offset_interactivo(robot_ip=None):
     print("=" * 60)
 
     if abs(dz) > 1e-6:
-        print("\n  [!] AVISO TFG: Has modificado la altura Z (dZ != 0).")
-        print("      Si esta trayectoria es para el perfilómetro Gocator,")
-        print("      asegúrate de que la distancia de trabajo respecto a la pieza sea adecuada.")
+        print("\n  [!] AVISO: Has modificado la altura Z (dZ != 0).")
+        print("      Asegúrate de que la distancia vertical respecto al plano de trabajo sea la adecuada.")
 
     # Opción para almacenar el nuevo punto en el archivo de puntos activo
     archivo_activo = get_nombre_archivo_puntos()

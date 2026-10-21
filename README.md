@@ -1,14 +1,14 @@
-# TFG: Control de Robot UR10e y Análisis con Perfilómetro Gocator 2600
+# TFG: Control Cinemático y Gestión de Trayectorias de Robot UR10e
 
-Repositorio de control cinemático, posicionamiento y gestión de escaneos desarrollado como parte del **Trabajo de Fin de Grado (TFG)** en **Ingeniería Informática**.
+Repositorio de control cinemático, posicionamiento y gestión de trayectorias desarrollado como parte del **Trabajo de Fin de Grado (TFG)** en **Ingeniería Informática**.
 
-El proyecto implementa una arquitectura modular en Python desacoplada y containerizada en Docker para interactuar de forma segura con un brazo robótico **Universal Robots UR10e** y un perfilómetro láser **Gocator 2600**, ambos montados sobre una plataforma móvil **Robotnik** y coordinados desde su computador industrial embarcado (**Onboard IPC**).
+El proyecto implementa una arquitectura modular en Python desacoplada y containerizada en Docker para interactuar y controlar de forma segura un brazo robótico **Universal Robots UR10e**, montado sobre una plataforma móvil **Robotnik** y coordinado desde su computador industrial embarcado (**Onboard IPC**).
 
 ---
 
 ## 🎯 ¿Qué es este Proyecto?
 
-El objetivo principal es la adquisición y análisis de perfiles de alta precisión mediante un sensor láser de triangulación (Gocator 2600) guiado en el espacio por el efector final de un UR10e.
+El objetivo principal es el control cinemático de alta precisión, la captura de telemetría y la gestión dinámica de posiciones y trayectorias del brazo robótico UR10e para tareas de posicionamiento, inspección y guiado manual.
 
 ### Características Principales:
 * **Comunicación de baja latencia con UR10e:** Utiliza el protocolo industrial **ur_rtde** (puerto de control 30004 y telemetría 30003) para lecturas de pose y trayectorias lineales en tiempo real.
@@ -57,8 +57,6 @@ cp .env.example .env
 Edita la IP del controlador del robot (URSim o Robot Físico):
 ```env
 ROBOT_IP=192.168.1.224
-GOCATOR_IP=192.168.1.10
-GOCATOR_PORT=8190
 ```
 
 > [!IMPORTANT]
@@ -158,7 +156,7 @@ Se conecta en tiempo real al robot vía RTDE (puerto 30004) con fallback al sock
 ---
 
 ### [3] Mover el robot a un punto
-Permite seleccionar uno de los puntos guardados y escoger el perfil de dinámica (`movement` a 0.05 m/s o `scan` a 0.008 m/s para escaneos lentos y estables). Ejecuta el movimiento en modo asíncrono mientras vigila si el usuario presiona `[ENTER]` o `[ESPACIO]` para detenerlo inmediatamente.
+Permite seleccionar uno de los puntos guardados y escoger el perfil de dinámica (`movement` a 0.05 m/s para movimientos generales o `scan` a 0.008 m/s para movimientos lentos de alta estabilidad). Ejecuta el movimiento en modo asíncrono mientras vigila si el usuario presiona `[ENTER]` o `[ESPACIO]` para detenerlo inmediatamente.
 
 **Caso 1: Movimiento completado con éxito:**
 ```text
@@ -282,7 +280,7 @@ Selecciona una opción [1-3] (o 'c' para cancelar): 1
 ---
 
 ### [7] Calcular punto final por offset XYZ (Experimental)
-Calcula una nueva pose TCP sumando o restando distancias en los ejes $X, Y, Z$ (en metros) a partir de una posición inicial (un punto existente, la pose actual del robot o coordenadas manuales). Conserva la orientación angular del efector final, evalúa la distancia euclídea 3D e incluye una advertencia preventiva de seguridad si se modifica la altura $Z$ para escaneos de perfilómetro.
+Calcula una nueva pose TCP sumando o restando distancias en los ejes $X, Y, Z$ (en metros) a partir de una posición inicial (un punto existente, la pose actual del robot o coordenadas manuales). Conserva la orientación angular del efector final, evalúa la distancia euclídea 3D e incluye una advertencia preventiva de seguridad si se modifica la altura $Z$ respecto al plano de trabajo original.
 
 **Salida en consola:**
 ```text
@@ -346,5 +344,5 @@ Saliendo del orquestador.
 ## 🔒 Directrices de Seguridad y Buenas Prácticas
 
 1. **Parada de Emergencia:** Mantén siempre accesible el teclado de la consola o la parada de emergencia física (seta de parada) del UR10e durante las pruebas en laboratorio.
-2. **Plano de Altura Constante ($Z$):** Para escaneos volumétricos con el perfilómetro Gocator 2600, verifica que la coordenada $Z$ permanezca dentro del rango de medición y foco calibrado del sensor durante todo el recorrido.
+2. **Plano de Altura Constante ($Z$):** Para operaciones que requieran mantener una distancia de trabajo fija, verifica que la coordenada $Z$ permanezca constante durante todo el recorrido.
 3. **Mantenimiento de Imágenes:** No modificar la estructura de capas del `Dockerfile` para no incrementar el tamaño de la imagen sobre los 216 MB optimizados.
