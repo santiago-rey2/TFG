@@ -5,6 +5,7 @@ Coordina los módulos funcionales del sistema:
   - check_pose        : Consulta de la pose TCP actual.
   - move_to_point     : Movimiento a puntos con parada de emergencia.
   - teach_mode        : Modo guiado manual (Freedrive).
+  - offset_calculator : Cálculo de punto final según offset/distancia de pieza XYZ (Experimental).
 """
 
 import os
@@ -25,6 +26,7 @@ from points_manager import (
 from check_pose import comprobar_punto_actual
 from move_to_point import mover_a_punto
 from teach_mode import activar_modo_manual
+from offset_calculator import calcular_offset_interactivo
 
 
 def main():
@@ -53,10 +55,11 @@ def main():
         print("  [4] Modo guiado manual libre (Teach Mode)")
         print("  [5] Almacenar posición actual")
         print("  [6] Seleccionar / Cambiar archivo de posiciones")
-        print("  [7] Salir")
+        print("  [7] Calcular punto final por offset XYZ (Experimental)")
+        print("  [8] Salir")
         print("-" * 55)
 
-        opcion = input("Elige una opción [1-7]: ").strip()
+        opcion = input("Elige una opción [1-8]: ").strip()
 
         if opcion == "1":
             listar_puntos()
@@ -70,11 +73,13 @@ def main():
             almacenar_posicion_actual(robot_ip)
         elif opcion == "6":
             seleccionar_archivo_puntos_interactivo()
-        elif opcion in ("7", "q", "exit"):
+        elif opcion == "7":
+            calcular_offset_interactivo(robot_ip)
+        elif opcion in ("8", "q", "exit"):
             print("\nSaliendo del orquestador.")
             break
         else:
-            print("[!] Opción no válida. Introduce un número del 1 al 7.")
+            print("[!] Opción no válida. Introduce un número del 1 al 8.")
 
 
 if __name__ == "__main__":
