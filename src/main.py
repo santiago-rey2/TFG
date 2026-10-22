@@ -5,7 +5,8 @@ Coordina los módulos funcionales del sistema:
   - check_pose        : Consulta de la pose TCP actual.
   - move_to_point     : Movimiento a puntos con parada de emergencia.
   - teach_mode        : Modo guiado manual (Freedrive).
-  - offset_calculator : Cálculo de punto final según offset/distancia de pieza XYZ (Experimental).
+    - offset_calculator : Cálculo de punto final según offset/distancia de pieza XYZ (Experimental).
+    - scan_between_points: Escaneo sincronizado con perfilómetro Gocator 2600 entre 2 puntos.
 """
 
 import os
@@ -27,6 +28,7 @@ from check_pose import comprobar_punto_actual
 from move_to_point import mover_a_punto
 from teach_mode import activar_modo_manual
 from offset_calculator import calcular_offset_interactivo
+from scan_between_points import escanear_entre_puntos
 
 
 def main():
@@ -34,6 +36,7 @@ def main():
     load_dotenv(dotenv_path=os.path.join(base_dir, ".env"))
     load_dotenv()
     robot_ip = os.getenv("ROBOT_IP", "192.168.1.224")
+    gocator_ip = os.getenv("GOCATOR_IP", "192.168.1.10")
 
     # Permitir especificar el archivo de puntos por argumento de consola o variable de entorno
     if len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
@@ -56,10 +59,11 @@ def main():
         print("  [5] Almacenar posición actual")
         print("  [6] Seleccionar / Cambiar archivo de posiciones")
         print("  [7] Calcular punto final por offset XYZ (Experimental)")
-        print("  [8] Salir")
+        print("  [8] Mover a un punto escaneando")
+        print("  [9] Salir")
         print("-" * 55)
 
-        opcion = input("Elige una opción [1-8]: ").strip()
+        opcion = input("Elige una opción [1-9]: ").strip()
 
         if opcion == "1":
             listar_puntos()
@@ -75,11 +79,13 @@ def main():
             seleccionar_archivo_puntos_interactivo()
         elif opcion == "7":
             calcular_offset_interactivo(robot_ip)
-        elif opcion in ("8", "q", "exit"):
+        elif opcion == "8":
+            escanear_entre_puntos(robot_ip, gocator_ip, config)
+        elif opcion in ("9", "q", "exit"):
             print("\nSaliendo del orquestador.")
             break
         else:
-            print("[!] Opción no válida. Introduce un número del 1 al 8.")
+            print("[!] Opción no válida. Introduce un número del 1 al 9.")
 
 
 if __name__ == "__main__":

@@ -1,2 +1,5 @@
 ur_rtde==1.6.3
 python-dotenv
+./gocator_py-0.1.0-py3-none-any.whl
+numpy>=2.0.0
+pillow>=11.0.0
