@@ -22,8 +22,9 @@ El objetivo principal es el análisis de los datos obtenidos mediante el escaneo
     - `move_to_point.py`: Ejecución de trayectorias lineales (`moveL`) a puntos con frenado de emergencia inmediato.
     - `teach_mode.py`: Activación y desactivación del modo guiado manual libre (`teachMode` y `endTeachMode`) con opción de guardado directo.
     - `offset_calculator.py`: Cálculo experimental de puntos finales aplicando desplazamientos relativos (offsets XYZ) a partir de una pose TCP origen.
+    - `scan_between_points.py`: Movimiento lineal hacia un punto objetivo desde la pose actual con escaneo sincronizado en segundo plano mediante perfilómetro Gocator 2600 (`gocator-py` / `ProfileScan`) y parada de emergencia.
 - **Infraestructura Docker:**
-    - Imágenes ultra ligeras optimizadas a **216 MB** (~75 MB comprimidas en tar.gz) para no saturar el almacenamiento del IPC del Robotnik.
+    - Imágenes multi-stage optimizadas en **Python 3.12-slim** (~220 MB) para compatibilidad con `gocator-py` y `numpy>=2.0.0` sin saturar el almacenamiento del IPC del Robotnik.
     - Orquestación mediante `docker-compose` con soporte TTY para sesiones interactivas desacopladas.
     - Configuración de red mediante archivo `.env` (ignorado en git).
 

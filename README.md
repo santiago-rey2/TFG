@@ -17,7 +17,8 @@ El objetivo principal es el control cinemático de alta precisión, la captura d
 * **Modo Guiado Manual (Teach Mode / Freedrive):** Activación de guiado libre con la mano desde la consola y guardado directo de la pose fijada.
 * **Gestión Dinámica de Puntos (`PointN`) y Edición en Caliente:** Almacenamiento y conmutación de archivos de posiciones `.json`. Los archivos de puntos son **modificables tanto con la aplicación en ejecución como en parado**, reflejándose cualquier cambio de forma inmediata sin reiniciar el contenedor.
 * **Cálculo Experimental por Offset XYZ:** Determinación matemática de puntos de llegada aplicando traslaciones relativas en función de las dimensiones de la pieza.
-* **Contenedor Ultraligero:** Imagen Docker multi-stage optimizada (~216 MB) para preservar el almacenamiento y recursos del IPC del Robotnik.
+* **Escaneo Sincronizado en Movimiento (Gocator 2600):** Integración con la librería `gocator-py` para adquirir perfiles láser mientras el brazo realiza movimientos lineales hacia un punto con velocidad `scan` constante (8 mm/s) y parada de emergencia inmediata.
+* **Contenedor Ultraligero:** Imagen Docker multi-stage optimizada en Python 3.12-slim (~220 MB) para preservar el almacenamiento y recursos del IPC del Robotnik.
 
 ---
 
@@ -36,6 +37,7 @@ El objetivo principal es el control cinemático de alta precisión, la captura d
 │   ├── move_to_point.py        # Movimiento lineal moveL con frenado de emergencia
 │   ├── offset_calculator.py    # Cálculo de punto final aplicando offsets XYZ de pieza (Experimental)
 │   ├── points_manager.py       # Serialización compacta, gestión de archivos y nombrado PointN
+│   ├── scan_between_points.py  # Escaneo sincronizado con perfilómetro Gocator 2600 entre 2 puntos
 │   └── teach_mode.py           # Modo guiado manual libre (teachMode y endTeachMode)
 ├── doc/                        # Bitácoras de laboratorio y documentación técnica
 ├── .dockerignore               # Filtro de exclusión para compilaciones Docker limpias
@@ -98,9 +100,10 @@ Al iniciar el programa se despliega el menú principal con el archivo de posicio
   [5] Almacenar posición actual
   [6] Seleccionar / Cambiar archivo de posiciones
   [7] Calcular punto final por offset XYZ (Experimental)
-  [8] Salir
+  [8] Mover a un punto escaneando
+  [9] Salir
 -------------------------------------------------------
-Elige una opción [1-8]: 
+Elige una opción [1-9]: 
 ```
 
 ---
@@ -318,12 +321,25 @@ Descripción (Enter para 'Offset desde origin (dx=+0.0000, dy=-0.4000, dz=+0.000
 
 ---
 
-### [8] Salir
+### [8] Mover a un punto escaneando
+Selecciona un punto del archivo activo y ejecuta un movimiento lineal (`moveL`) hacia él desde la posición actual del robot mientras adquiere perfiles en segundo plano con el perfilómetro **Gocator 2600** (`gocator-py`).
+
+- **Cinemática fija:** Aplica de forma automática el perfil `"scan"` de [`config/movement_config.json`](config/movement_config.json) (`speed = 0.008` m/s = 8 mm/s, `acceleration = 0.1` m/s²), sincronizando la velocidad `travel_speed` del sensor en mm/s para reconstrucción cuadrada de píxeles (`frame_rate="auto"`).
+- **Parada de emergencia:** Monitoreo en tiempo real; presionar `[ENTER]` o `[ESPACIO]` frena al instante el robot (`stopL`) y detiene limpiamente el sensor.
+- **Guardado:** Al completarse el movimiento o detenerse, el resultado se almacena en la carpeta `scans/<nombre>/` con imágenes CEND/PNG, nube de puntos y metadatos.
+
+> [!NOTE]
+> **Validación en Laboratorio Pendiente de Hardware Físico:**  
+> La integración y el flujo cinemático han sido probados y validados a nivel de software y contenedor. Dado que en la fase actual de desarrollo no se cuenta con acceso físico directo al perfilómetro Gocator 2600, los outputs de consola y archivos de captura reales se registrarán y completarán en la bitácora técnica durante las próximas pruebas en laboratorio.
+
+---
+
+### [9] Salir
 Cierra limpiamente el bucle interactivo del orquestador y libera cualquier conexión activa con el controlador.
 
 **Salida en consola:**
 ```text
-Elige una opción [1-8]: 8
+Elige una opción [1-9]: 9
 
 Saliendo del orquestador.
 ```
