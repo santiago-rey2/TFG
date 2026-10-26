@@ -13,4 +13,5 @@ services:
       - ./src:/app/src
       - ./config:/app/config:ro
       - ./points:/app/points
+      - ./scans:/app/scans        # Persistencia de los escaneos del Gocator en el host
     command: python src/main.py

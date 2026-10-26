@@ -28,6 +28,10 @@ wheels/
 # Variables de entorno (¡Crítico para seguridad!)
 .env
 
+# Escaneos del perfilómetro (datos de gran tamaño)
+scans/*
+!scans/.gitkeep
+
 # Docker
 .dockerignore
 *.tar
