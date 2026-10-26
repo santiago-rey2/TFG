@@ -29,8 +29,10 @@ El objetivo principal es el control cinemático de alta precisión, la captura d
 │   └── movement_config.json    # Perfiles de dinámica protegidos de solo lectura (:ro) (velocidad y aceleración)
 ├── points/
 │   └── points.json             # Almacén de coordenadas cartesianas (modificable en caliente y en parado)
+├── scans/                      # Directorio persistente montado en host para los escaneos del Gocator
 ├── src/
-│   ├── main.py                 # Orquestador principal y menú interactivo CLI
+│   ├── main.py                 # Orquestador principal y menú interactivo CLI (gestión de .env)
+│   ├── arm_connection.py       # Conexión RTDE con el brazo y movimiento lineal con parada de emergencia
 │   ├── check_pose.py           # Consulta en tiempo real de la pose TCP (RTDE y socket 30003)
 │   ├── config_manager.py       # Carga y selección de setups de movimiento
 │   ├── keyboard_listener.py    # Captura multiplataforma de parada de emergencia (ENTER / ESPACIO)
@@ -42,7 +44,7 @@ El objetivo principal es el control cinemático de alta precisión, la captura d
 ├── doc/                        # Bitácoras de laboratorio y documentación técnica
 ├── .dockerignore               # Filtro de exclusión para compilaciones Docker limpias
 ├── .env.example                # Plantilla de variables de entorno de red
-├── Dockerfile                  # Construcción multi-stage ligera en Python 3.11-slim
+├── Dockerfile                  # Construcción multi-stage ligera en Python 3.12-slim
 ├── docker-compose.yml          # Orquestación del contenedor con TTY interactivo
 └── requirements.txt            # Dependencias Python mínimas (ur_rtde, python-dotenv)
 ```
@@ -56,10 +58,14 @@ Crea un archivo `.env` en la raíz del proyecto basado en `.env.example`:
 ```bash
 cp .env.example .env
 ```
-Edita la IP del controlador del robot (URSim o Robot Físico):
+Edita la IP del controlador del brazo robótico (URSim o Robot Físico):
 ```env
-ROBOT_IP=192.168.1.210
+ARM_IP=192.168.0.210
+GOCATOR_IP=192.168.1.10
 ```
+
+> [!NOTE]
+> `ARM_IP` identifica específicamente al controlador del brazo robótico UR10e. No debe confundirse con la IP de la plataforma móvil Robotnik, la cual no es requerida por este software.
 
 > [!IMPORTANT]
 > El archivo `.env` contiene parámetros de red específicos del laboratorio y nunca debe subirse al control de versiones.

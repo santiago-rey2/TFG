@@ -203,13 +203,19 @@ services:
     volumes:
       - ./config:/app/config:ro
       - ./points:/app/points
+      - ./scans:/app/scans
     command: python src/main.py
 ```
 
 ### 2. Archivo `.env`
 ```env
-ROBOT_IP=192.168.1.210
+# IP del controlador del brazo robótico UR10e (no confundir con la plataforma Robotnik)
+ARM_IP=192.168.0.210
+GOCATOR_IP=192.168.1.10
 ```
+
+> [!WARNING]
+> Si se actualiza desde una versión anterior del software en el IPC del Robotnik, debe renombrarse la clave `ROBOT_IP` por `ARM_IP` en el archivo `.env` local.
 
 ### 3. Archivo de Configuración Protegido (`config/movement_config.json`)
 ```json
