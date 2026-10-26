@@ -4,11 +4,8 @@ Lectura, escritura, serialización compacta y selección de archivos de puntos (
 """
 
 import os
-import sys
 import json
 import re
-
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Re-exportación para retrocompatibilidad
 from config_manager import cargar_config_movimiento, seleccionar_setup  # noqa: F401
@@ -209,7 +206,7 @@ def guardar_punto(nombre, pose, descripcion="", path=None):
     return nombre
 
 
-def almacenar_posicion_actual(robot_ip, pose_previa=None, path=None):
+def almacenar_posicion_actual(arm_ip, pose_previa=None, path=None):
     """Obtiene la pose actual del robot y la guarda en el archivo activo."""
     archivo = path if path else get_puntos_path()
     rel = get_nombre_archivo_puntos() if not path else os.path.basename(path)
@@ -218,7 +215,7 @@ def almacenar_posicion_actual(robot_ip, pose_previa=None, path=None):
         pose = pose_previa
     else:
         from check_pose import comprobar_punto_actual
-        pose = comprobar_punto_actual(robot_ip)
+        pose = comprobar_punto_actual(arm_ip)
 
     if not pose:
         print("[!] No se pudo obtener la pose actual del robot. Operación cancelada.")

@@ -12,15 +12,15 @@ except ImportError:
     RTDEReceive = None
 
 
-def comprobar_punto_actual(robot_ip, timeout=2.0):
+def comprobar_punto_actual(arm_ip, timeout=2.0):
     """Consulta y muestra por consola la pose actual del TCP del robot."""
-    print(f"\n[*] Consultando pose actual del robot en {robot_ip}...")
+    print(f"\n[*] Consultando pose actual del robot en {arm_ip}...")
     tcp = None
 
     # Intento 1: ur_rtde si está instalado en el entorno
     if RTDEReceive is not None:
         try:
-            rtde = RTDEReceive(robot_ip)
+            rtde = RTDEReceive(arm_ip)
             if rtde.isConnected():
                 tcp = rtde.getActualTCPPose()
                 rtde.disconnect()
@@ -30,7 +30,7 @@ def comprobar_punto_actual(robot_ip, timeout=2.0):
     # Intento 2: Socket directo puerto 30003 (fallback universal sin librerías C++)
     if tcp is None:
         try:
-            with socket.create_connection((robot_ip, 30003), timeout=timeout) as s:
+            with socket.create_connection((arm_ip, 30003), timeout=timeout) as s:
                 data = b""
                 while len(data) < 492:
                     chunk = s.recv(492 - len(data))

@@ -4,12 +4,7 @@ Permite calcular una nueva pose TCP sumando o restando desplazamientos en los ej
 a partir de una posición inicial (punto guardado, pose en vivo o entrada manual).
 """
 
-import os
-import sys
 import math
-
-# Asegurar que el directorio src/ esté en el PATH para importaciones limpias
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from points_manager import (
     leer_puntos,
@@ -59,10 +54,12 @@ def solicitar_offset(eje_nombre):
             print(f"  [!] Entrada inválida. Introduce un número real para {eje_nombre}.")
 
 
-def calcular_offset_interactivo(robot_ip=None):
+def calcular_offset_interactivo(arm_ip):
     """
     Asistente interactivo por consola para calcular y opcionalmente guardar
     el punto final a partir de desplazamientos XYZ de pieza.
+
+    :param arm_ip: Dirección IP del controlador del brazo UR10e (para capturar la pose en vivo).
     """
     print("\n" + "=" * 60)
     print("  CÁLCULO DE PUNTO FINAL POR OFFSET DE PIEZA (XYZ) - EXPERIMENTAL")
@@ -100,10 +97,8 @@ def calcular_offset_interactivo(robot_ip=None):
             return None
 
     elif opcion == "2":
-        if not robot_ip:
-            robot_ip = os.getenv("ROBOT_IP", "192.168.1.224")
-        print(f"[*] Obteniendo pose TCP actual desde {robot_ip}...")
-        pose_origen = comprobar_punto_actual(robot_ip)
+        print(f"[*] Obteniendo pose TCP actual desde {arm_ip}...")
+        pose_origen = comprobar_punto_actual(arm_ip)
         if not pose_origen:
             print("[!] No se pudo obtener la pose del robot.")
             return None
@@ -168,12 +163,3 @@ def calcular_offset_interactivo(robot_ip=None):
         guardar_punto(nombre_final, pose_final, desc_final)
 
     return pose_final
-
-
-if __name__ == "__main__":
-    from dotenv import load_dotenv
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    load_dotenv(dotenv_path=os.path.join(base_dir, ".env"))
-    load_dotenv()
-    robot_ip_env = os.getenv("ROBOT_IP", "192.168.1.224")
-    calcular_offset_interactivo(robot_ip_env)

@@ -7,6 +7,9 @@ Coordina los módulos funcionales del sistema:
   - teach_mode        : Modo guiado manual (Freedrive).
     - offset_calculator : Cálculo de punto final según offset/distancia de pieza XYZ (Experimental).
     - scan_between_points: Escaneo sincronizado con perfilómetro Gocator 2600 entre 2 puntos.
+  - arm_connection    : Conexión RTDE con el brazo y movimiento lineal con parada de emergencia.
+
+Es el único módulo que carga las variables de entorno (.env); el resto las recibe como parámetros.
 """
 
 import os
@@ -31,18 +34,25 @@ from offset_calculator import calcular_offset_interactivo
 from scan_between_points import escanear_entre_puntos
 
 
-def main():
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    load_dotenv(dotenv_path=os.path.join(base_dir, ".env"))
-    load_dotenv()
-    robot_ip = os.getenv("ROBOT_IP", "192.168.1.224")
-    gocator_ip = os.getenv("GOCATOR_IP", "192.168.1.10")
+# ==========================================================
+# Configuración del entorno (.env)
+# Única carga de variables de entorno de toda la aplicación.
+# Los módulos reciben estos valores como parámetros desde main().
+# ==========================================================
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"))
 
+ARM_IP = os.getenv("ARM_IP", "192.168.0.210")         # Controlador del brazo robótico UR10e
+GOCATOR_IP = os.getenv("GOCATOR_IP", "192.168.1.10")  # Perfilómetro Gocator 2600
+POINTS_FILE = os.getenv("POINTS_FILE")                # Archivo de puntos inicial (opcional)
+
+
+def main():
     # Permitir especificar el archivo de puntos por argumento de consola o variable de entorno
     if len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
         set_puntos_path(sys.argv[1])
-    elif os.getenv("POINTS_FILE"):
-        set_puntos_path(os.getenv("POINTS_FILE"))
+    elif POINTS_FILE:
+        set_puntos_path(POINTS_FILE)
 
     config = cargar_config_movimiento()
 
@@ -68,19 +78,19 @@ def main():
         if opcion == "1":
             listar_puntos()
         elif opcion == "2":
-            comprobar_punto_actual(robot_ip)
+            comprobar_punto_actual(ARM_IP)
         elif opcion == "3":
-            mover_a_punto(robot_ip, config)
+            mover_a_punto(ARM_IP, config)
         elif opcion == "4":
-            activar_modo_manual(robot_ip)
+            activar_modo_manual(ARM_IP)
         elif opcion == "5":
-            almacenar_posicion_actual(robot_ip)
+            almacenar_posicion_actual(ARM_IP)
         elif opcion == "6":
             seleccionar_archivo_puntos_interactivo()
         elif opcion == "7":
-            calcular_offset_interactivo(robot_ip)
+            calcular_offset_interactivo(ARM_IP)
         elif opcion == "8":
-            escanear_entre_puntos(robot_ip, gocator_ip, config)
+            escanear_entre_puntos(ARM_IP, GOCATOR_IP, config)
         elif opcion in ("9", "q", "exit"):
             print("\nSaliendo del orquestador.")
             break
